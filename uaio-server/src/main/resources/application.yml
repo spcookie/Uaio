@@ -1,0 +1,19 @@
+micronaut:
+  application:
+    name: uaio-server
+datasources:
+  default:
+    driver-class-name: org.postgresql.Driver
+    db-type: postgres
+    allow-pool-suspension: true
+r2dbc:
+  datasources:
+    default:
+      schema-generate: CREATE_DROP
+      dialect: POSTGRES
+      db-type: postgres
+jobrunr:
+  background-job-server:
+    enabled: false
+  dashboard:
+    enabled: false

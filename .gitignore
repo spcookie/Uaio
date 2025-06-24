@@ -433,3 +433,20 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# server
+Thumbs.db
+.DS_Store
+.gradle
+uaio-server/build/
+uaio-server/target/
+uaio-server/out/
+.micronaut/
+.idea
+*.iml
+*.ipr
+*.iws
+.project
+.settings
+.classpath
+.factorypath
+
