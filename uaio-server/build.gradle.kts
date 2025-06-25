@@ -1,4 +1,4 @@
-import jdk.tools.jlink.resources.plugins
+//import jdk.tools.jlink.resources.plugins
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
@@ -25,6 +25,7 @@ dependencies {
     kapt("io.micronaut.microstream:micronaut-microstream-annotations")
     kapt("io.micronaut.serde:micronaut-serde-processor")
     kapt("io.micronaut.validation:micronaut-validation-processor")
+    kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
     implementation("io.micrometer:context-propagation")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut:micronaut-management")
@@ -59,6 +60,14 @@ dependencies {
     developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-management")
     developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-ui")
     testResourcesService("org.postgresql:postgresql")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.19.0")
+    implementation("cn.hutool:hutool-all:5.8.20")
+    implementation("io.ktor:ktor-server-core-jvm:3.2.0")
+    implementation("io.ktor:ktor-server-netty:3.2.0")
+    implementation("io.ktor:ktor-server-core:3.2.0")
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
 }
 
 
