@@ -5,10 +5,10 @@ import io.net.domain.model.entity.Mock
 
 interface MockRepository {
 
-    fun save(mock: Mock)
+    suspend fun save(mock: Mock)
 
-    fun removeById(id: ID)
+    suspend fun removeById(id: ID)
 
-    fun updateById(mock: Mock)
+    suspend fun updateById(mock: Mock)
 
 }

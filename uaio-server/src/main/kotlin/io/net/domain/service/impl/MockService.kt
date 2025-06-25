@@ -3,6 +3,7 @@ package io.net.domain.service.impl
 import io.net.component.domain.ID
 import io.net.domain.model.entity.Mock
 import io.net.domain.model.entity.MockEngine
+import io.net.domain.model.valueobject.MockServerConfig
 import io.net.domain.service.IMockService
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
@@ -23,19 +24,23 @@ class MockService : IMockService {
         mockEngine.stop()
     }
 
-    override fun generate(mock: Mock): String {
+    override suspend fun generate(mock: Mock): String {
         return mockEngine.mock(mock.config.template)
     }
 
-    override fun save(mock: Mock) {
+    override suspend fun save(mock: Mock) {
         TODO("Not yet implemented")
     }
 
-    override fun removeById(id: ID) {
+    override suspend fun removeById(id: ID) {
         TODO("Not yet implemented")
     }
 
-    override fun updateById(mock: Mock) {
+    override suspend fun updateById(mock: Mock) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateServerConfig(config: MockServerConfig) {
         TODO("Not yet implemented")
     }
 
