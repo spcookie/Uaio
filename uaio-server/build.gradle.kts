@@ -24,6 +24,8 @@ dependencies {
     kapt("io.micronaut.serde:micronaut-serde-processor")
     kapt("io.micronaut.validation:micronaut-validation-processor")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    kapt("io.micronaut.openapi:micronaut-openapi")
+    kapt("io.micronaut.openapi:micronaut-openapi-adoc")
     implementation("io.micrometer:context-propagation")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut:micronaut-management")
@@ -49,25 +51,26 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlinx:atomicfu:0.19.0")
-    implementation("cn.hutool:hutool-all:5.8.20")
+    implementation("cn.hutool:hutool-all:5.8.24")
     implementation("io.ktor:ktor-server-core-jvm:2.3.13")
     implementation("io.ktor:ktor-server-netty:2.3.13")
     implementation("io.ktor:ktor-server-core:2.3.13")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     compileOnly("io.micronaut:micronaut-http-client")
+    compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("io.r2dbc:r2dbc-h2")
     runtimeOnly("org.yaml:snakeyaml")
-    developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-management")
-    developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-ui")
+    implementation("io.micronaut.controlpanel:micronaut-control-panel-management")
+    implementation("io.micronaut.controlpanel:micronaut-control-panel-ui")
 }
-
 
 application {
     mainClass = "io.net.ApplicationKt"
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
@@ -90,8 +93,8 @@ micronaut {
     aot {
         // Please review carefully the optimizations enabled below
         // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
-        optimizeServiceLoading = false
-        convertYamlToJava = false
+        optimizeServiceLoading = true
+        convertYamlToJava = true
         precomputeOperations = true
         cacheEnvironment = true
         optimizeClassLoading = true
