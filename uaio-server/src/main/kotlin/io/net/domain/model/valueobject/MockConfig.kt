@@ -13,17 +13,14 @@ data class MockConfig(
 
     sealed interface Arg {
         val name: String
-        val value: String
     }
 
     data class QueryArg(
         override val name: String,
-        override val value: String
     ) : Arg
 
     data class PathArg(
         override val name: String,
-        override val value: String
     ) : Arg
 
     data class Header(

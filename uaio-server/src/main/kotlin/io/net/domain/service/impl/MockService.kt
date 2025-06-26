@@ -1,18 +1,31 @@
 package io.net.domain.service.impl
 
-import io.net.component.domain.ID
+import io.micronaut.transaction.annotation.Transactional
+import io.net.components.domain.ID
 import io.net.domain.model.entity.Mock
 import io.net.domain.model.entity.MockEngine
+import io.net.domain.model.entity.MockServer
 import io.net.domain.model.valueobject.MockServerConfig
+import io.net.domain.repository.MockRepository
 import io.net.domain.service.IMockService
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
 import jakarta.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Singleton
-class MockService : IMockService {
+class MockService(
+    val mockRepository: MockRepository
+) : IMockService {
 
     private val mockEngine = MockEngine()
+
+    private val mutex = Mutex()
+
+    private lateinit var mockServer: MockServer
 
     @PostConstruct
     fun init() {
@@ -24,24 +37,55 @@ class MockService : IMockService {
         mockEngine.stop()
     }
 
-    override suspend fun generate(mock: Mock): String {
-        return mockEngine.mock(mock.config.template)
+    override suspend fun generate(template: String): String {
+        return mockEngine.mock(template)
     }
 
+    @Transactional(rollbackFor = [Exception::class])
     override suspend fun save(mock: Mock) {
-        TODO("Not yet implemented")
+        mockRepository.save(mock)
+        mockServer.addMock(mock)
+    }
+
+    override suspend fun list(): Flow<Mock> {
+        return mockRepository.list()
     }
 
     override suspend fun removeById(id: ID) {
-        TODO("Not yet implemented")
+        mockRepository.removeById(id)
     }
 
     override suspend fun updateById(mock: Mock) {
-        TODO("Not yet implemented")
+        mockRepository.updateById(mock)
     }
 
-    override suspend fun updateServerConfig(config: MockServerConfig) {
-        TODO("Not yet implemented")
+    override suspend fun refreshServerConfig(config: MockServerConfig) {
+        mutex.withLock {
+            if (::mockServer.isInitialized) {
+                if (mockServer.config.port != config.port) {
+                    mockServer.stop()
+                    mockServer = MockServer(config, mockEngine, list().toList())
+                    mockServer.start()
+                }
+            }
+        }
+    }
+
+    override suspend fun startServer(config: MockServerConfig): Boolean {
+        return mutex.withLock {
+            if (::mockServer.isInitialized) {
+                mockServer = MockServer(config, mockEngine, list().toList())
+            }
+            mockServer.start()
+        }
+    }
+
+    override suspend fun stopServer(config: MockServerConfig) {
+        mutex.withLock {
+            if (::mockServer.isInitialized) {
+                mockServer.stop()
+            }
+        }
     }
 
 }

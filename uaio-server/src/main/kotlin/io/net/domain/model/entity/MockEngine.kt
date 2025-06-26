@@ -1,8 +1,8 @@
 package io.net.domain.model.entity
 
 import io.micronaut.core.io.ResourceLoader
-import io.net.component.domain.Entity
-import io.net.component.domain.GlobalUniqueID
+import io.net.components.domain.Entity
+import io.net.components.domain.GlobalUniqueID
 import io.net.toolkit.BeanUtils
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
@@ -14,7 +14,7 @@ import kotlinx.coroutines.future.asCompletableFuture
 import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Source
 
-class MockEngine : Entity(GlobalUniqueID) {
+class MockEngine : Entity(GlobalUniqueID()) {
 
     private val scope = CoroutineScope(SupervisorJob() + CoroutineName("mock-engine-coroutine"))
 
@@ -22,17 +22,20 @@ class MockEngine : Entity(GlobalUniqueID) {
 
     private val receiveChannel = Channel<String>(10)
 
-    private val statue = atomic(Statue.INITIALIZATION)
+    private val _statue = atomic(Statue.INITIALIZATION)
 
-    private enum class Statue {
+    val statue: Statue
+        get() = _statue.value
+
+    enum class Statue {
         INITIALIZATION, RUNNING, STOPPED
     }
 
     fun start() {
-        if (statue.compareAndSet(Statue.INITIALIZATION, Statue.RUNNING)) {
+        if (_statue.compareAndSet(Statue.INITIALIZATION, Statue.RUNNING)) {
             scope.launch {
                 val loader = BeanUtils.getBean<ResourceLoader>()
-                val mockJs = loader.getResourceAsStream("classpath:mock.js")
+                val mockJs = loader.getResourceAsStream("classpath:js/mock.js")
                     .orElseThrow()
                     .readAllBytes()
                     .toString(Charsets.UTF_8)
@@ -52,13 +55,13 @@ class MockEngine : Entity(GlobalUniqueID) {
     }
 
     fun stop() {
-        if (statue.compareAndSet(Statue.RUNNING, Statue.STOPPED)) {
+        if (_statue.compareAndSet(Statue.RUNNING, Statue.STOPPED)) {
             scope.cancel()
         }
     }
 
     fun mock(template: String): String {
-        if (statue.value != Statue.RUNNING) {
+        if (_statue.value != Statue.RUNNING) {
             throw IllegalStateException("mock engine is not running")
         }
         return scope.async {
