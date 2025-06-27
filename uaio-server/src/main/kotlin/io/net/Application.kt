@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.info.Info
 
 @OpenAPIDefinition(
     info = Info(
-        title = "uaio-server",
+        title = "Utils all in one",
         version = "0.1"
     )
 )

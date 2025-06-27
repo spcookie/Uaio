@@ -1,7 +1,9 @@
 package io.net.components.dto
 
+import io.micronaut.serde.annotation.Serdeable
 import kotlin.properties.Delegates
 
+@Serdeable
 class Result<T> {
 
     var code by Delegates.notNull<Int>()
@@ -9,8 +11,6 @@ class Result<T> {
     var message: String? = null
 
     var data: T? = null
-
-    val timestamp: Long = System.currentTimeMillis()
 
     companion object {
 
@@ -27,9 +27,9 @@ class Result<T> {
             return result
         }
 
-        fun <T> fail(code: ResultCode, message: String?): Result<T> {
+        fun <T> fail(code: Int, message: String?): Result<T> {
             val result = Result<T>()
-            result.code = code.code
+            result.code = code
             result.message = message
             return result
         }

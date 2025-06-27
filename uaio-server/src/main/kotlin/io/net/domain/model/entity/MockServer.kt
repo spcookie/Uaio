@@ -19,7 +19,7 @@ class MockServer(
     val config: MockServerConfig,
     val mockEngine: MockEngine,
     initMocks: List<Mock> = listOf<Mock>()
-) : Entity(GlobalUniqueID()) {
+) : Entity(GlobalUniqueID) {
 
     lateinit var server: NettyApplicationEngine
 
@@ -39,20 +39,22 @@ class MockServer(
     }
 
     fun start(): Boolean {
-        if (!::server.isInitialized
-            || _statue.compareAndSet(Statue.INITIALIZATION, Statue.RUNNING)
-            || _statue.compareAndSet(Statue.STOPPED, Statue.RUNNING)
-        ) {
-            server = embeddedServer(Netty, config.port) {
-                routing {
-                    route("{...}") {
-                        handle {
-                            dispatch()
+        if (!::server.isInitialized) {
+            if (_statue.compareAndSet(Statue.INITIALIZATION, Statue.RUNNING)
+                || _statue.compareAndSet(Statue.STOPPED, Statue.RUNNING)
+            ) {
+                server = embeddedServer(Netty, config.port) {
+                    routing {
+                        route("{...}") {
+                            handle {
+                                dispatch()
+                            }
                         }
                     }
-                }
-            }.start()
-            return true
+                }.start()
+                return true
+            }
+            return false
         }
         return false
     }

@@ -13,8 +13,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.future.asCompletableFuture
 import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Source
+import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 
-class MockEngine : Entity(GlobalUniqueID()) {
+class MockEngine : Entity(GlobalUniqueID) {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(MockEngine::class.java)
+    }
 
     private val scope = CoroutineScope(SupervisorJob() + CoroutineName("mock-engine-coroutine"))
 
@@ -41,12 +47,18 @@ class MockEngine : Entity(GlobalUniqueID()) {
                     .toString(Charsets.UTF_8)
                 Context.newBuilder("js")
                     .build()
-                    .use {
-                        it.eval(Source.newBuilder("js", mockJs, "mock.js").build())
+                    .use { ctx ->
+                        ctx.eval(Source.newBuilder("js", mockJs, "mock.js").build())
                         sendChannel.receiveAsFlow()
                             .onEach { template ->
-                                val result = it.eval(Source.newBuilder("js", template, "mock.js").build()).asString()
-                                receiveChannel.send(result)
+                                try {
+                                    val mock = "JSON.stringify(Mock.mock(${template}), null, 4)"
+                                    val result = ctx.eval(Source.newBuilder("js", mock, "mock.js").build()).asString()
+                                    receiveChannel.send(result)
+                                } catch (e: Exception) {
+                                    log.error("mock engine error: {}", e.message, e)
+                                    receiveChannel.send("error")
+                                }
                             }
                             .collect()
                     }
@@ -68,7 +80,7 @@ class MockEngine : Entity(GlobalUniqueID()) {
             sendChannel.send(template)
             receiveChannel.receive()
         }.asCompletableFuture()
-            .get()
+            .get(10, TimeUnit.SECONDS)
     }
 
 }

@@ -1,7 +1,7 @@
 package io.net.infrastructure.convert
 
+import io.net.common.enums.HttpArg
 import io.net.components.domain.identify
-import io.net.components.domain.scalar
 import io.net.domain.model.entity.Mock
 import io.net.domain.model.valueobject.MockConfig
 import io.net.infrastructure.adapter.db.po.MockPO
@@ -19,7 +19,7 @@ abstract class MockConvert {
 
     fun toPO(entity: Mock): MockPO {
         return MockPO().apply {
-            id = entity.id.scalar
+            id = entity.id.value
             method = entity.config.method.name
             path = entity.config.path
             headers = entity.config.headers.associate {
@@ -31,6 +31,7 @@ abstract class MockConvert {
                     is MockConfig.QueryArg -> "query" to it.name
                 }
             }
+            template = entity.config.template
         }
     }
 
@@ -45,8 +46,8 @@ abstract class MockConvert {
                 } ?: listOf(),
                 args = po.args?.map {
                     when (it.first) {
-                        "path" -> MockConfig.PathArg(it.second)
-                        "query" -> MockConfig.QueryArg(it.second)
+                        HttpArg.Query.value -> MockConfig.QueryArg(it.second)
+                        HttpArg.Path.value -> MockConfig.PathArg(it.second)
                         else -> throw IllegalArgumentException("unknown arg type: ${it.first}")
                     }
                 } ?: listOf(),

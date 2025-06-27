@@ -1,7 +1,9 @@
 package io.net.infrastructure.adapter.repository
 
 import io.net.components.domain.ID
+import io.net.components.domain.scalar
 import io.net.domain.model.entity.Mock
+import io.net.domain.model.valueobject.MockConfig
 import io.net.domain.repository.MockRepository
 import io.net.infrastructure.adapter.db.dao.MockDAO
 import io.net.infrastructure.convert.MockConvert
@@ -31,4 +33,21 @@ class MockRepositoryImpl(val mockDAO: MockDAO) : MockRepository {
             .map { po -> po.convert() }
             .asFlow()
     }
+
+    override suspend fun findByMethodAndPath(method: MockConfig.Method, path: String): Flow<Mock> {
+        return mockDAO.findAllByMethodAndPath(method.name, path)
+            .map { po -> po.convert() }
+            .asFlow()
+    }
+
+    override suspend fun findAllByMethodAndPathAndIdNotEqual(
+        method: MockConfig.Method,
+        path: String,
+        id: ID
+    ): Flow<Mock> {
+        return mockDAO.findAllByMethodAndPathAndIdNotEqual(method.name, path, id.scalar)
+            .map { po -> po.convert() }
+            .asFlow()
+    }
+
 }

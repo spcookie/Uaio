@@ -6,9 +6,12 @@ open class ID internal constructor(val value: Long?) {
     companion object
 }
 
-class GlobalUniqueID : ID(IdUtil.getSnowflakeNextId())
+class RandomID internal constructor() : ID(IdUtil.getSnowflakeNextId())
 
-class PlaceholderID : ID(null)
+object PlaceholderID : ID(null)
+
+val GlobalUniqueID
+    get() = RandomID()
 
 fun ID.Companion.from(value: Long): ID {
     return ID(value)
@@ -16,7 +19,7 @@ fun ID.Companion.from(value: Long): ID {
 
 fun ID.Companion.into(id: ID): Long {
     if (id is PlaceholderID) {
-        throw IllegalArgumentException("PlaceholderID can not be converted to Long")
+        throw IllegalArgumentException("id cannot be empty")
     } else {
         return id.value!!
     }
@@ -25,7 +28,7 @@ fun ID.Companion.into(id: ID): Long {
 val Long?.identify: ID
     get() {
         return if (this == null) {
-            PlaceholderID()
+            PlaceholderID
         } else {
             ID.from(this)
         }
