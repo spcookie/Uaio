@@ -14,6 +14,7 @@ import io.net.interfaces.rest.param.MockCommandRequest
 import io.net.interfaces.rest.param.ServerCommandRequest
 import io.net.interfaces.rest.response.MockResponse
 import io.net.interfaces.rest.response.MockServerStatusResponse
+import io.net.interfaces.rest.response.MockTreeResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.map
@@ -79,6 +80,14 @@ class MockController(
         return mono {
             mockService.removeById(id.identify)
         }.thenReturn<Result<Unit>>(Result.success())
+    }
+
+    @Operation(tags = [OPENAPI_TAG], summary = "获取 Mock 列表")
+    @Get("/tree")
+    fun listTree(): Mono<Result<List<MockTreeResponse>>> {
+        return mono {
+            Result.success(mockService.list().map { it.convert() }.toList())
+        }
     }
 
 }

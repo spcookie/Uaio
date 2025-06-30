@@ -1,7 +1,7 @@
 import httpx
 from typing import Any, Dict, Optional
 
-class APIClient:
+class Client:
     def __init__(self, base_url: str = "http://localhost:8080/api"):
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=30.0)

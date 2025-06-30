@@ -1,49 +1,47 @@
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal
-from textual.widgets import Header, Footer, Static
 from textual.binding import Binding
+from textual.widgets import Footer, Static
 
-from components.sidebar import SidebarButton
-from components.feature import FeatureContent
-from components.mock import MockFeature
-from viewmodels.main_vm import MainViewModel
+from components.container import IContainer
+from components.sidebar import SidebarItem
+from pages.dashboard import Dashboard
+from pages.mock import Mock
+
 
 class UaoiTUI(App):
+    TITLE = "A Question App"
+
     CSS_PATH = "style.tcss"
 
     BINDINGS = [
-        Binding("q", "quit", "退出", show=True),
+        Binding("^q", "quit", "quit", show=True),
     ]
 
     def __init__(self):
         super().__init__()
-        self.view_model = MainViewModel()
 
     def compose(self) -> ComposeResult:
-        yield Header()
-        with Horizontal():
-            with Container(id="sidebar"):
-                for feature_id, label in self.view_model.get_features().items():
-                    yield SidebarButton(label, feature_id=feature_id)
-            with Container(id="content"):
-                yield Static("请选择一个功能", classes="welcome-text")
+        # yield Header(show_clock=True)
+        yield IContainer(
+            items=[
+                SidebarItem("Dashboard", "dashboard"),
+                SidebarItem("Mock", "mock"),
+                SidebarItem("Util", "util"),
+                SidebarItem("Setting", "setting")
+            ],
+            widgets=[
+                Dashboard(feature_id="dashboard"),
+                Mock(feature_id="mock"),
+                Static("Util", id="util"),
+                Static("Setting", id="setting"),
+            ],
+            sidebar_title="Menu"
+        )
         yield Footer()
 
-    def on_button_pressed(self, event: SidebarButton.Pressed) -> None:
-        if isinstance(event.button, SidebarButton):
-            if self.view_model.get_current_feature():
-                self.query_one("#content").remove_children()
+    def on_mount(self) -> None:
+        self.theme = "tokyo-night"
 
-            if event.button.feature_id == "mock":
-                self.query_one("#content").mount(MockFeature())
-            else:
-                feature_content = FeatureContent(event.button.feature_id, self.view_model.api_client)
-                self.query_one("#content").mount(feature_content)
-
-            self.view_model.set_current_feature(event.button.feature_id)
-
-    async def on_unmount(self) -> None:
-        await self.view_model.close()
 
 if __name__ == "__main__":
     app = UaoiTUI()

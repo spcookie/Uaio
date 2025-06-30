@@ -26,4 +26,6 @@ interface IMockService {
 
     suspend fun getServerStats(): MockServer.Statue?
 
+    suspend fun listTree(): Flow<Mock>
+
 }
