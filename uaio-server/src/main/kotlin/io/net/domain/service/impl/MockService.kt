@@ -134,19 +134,33 @@ class MockService(
             }
             .toList()
             .toMutableList()
-        val root = MockTreeConfig(children = mutableListOf())
+        val root = MockTreeConfig(
+            path = "/",
+            children = mutableListOf()
+        )
         dfs(root, mocks)
         return root
     }
 
     private fun dfs(root: MockTreeConfig, mocks: List<MockTreeConfig>, deep: Int = 0) {
         mocks.groupBy { mock ->
-            mock.path?.substring(0, mock.path.indexOf('/', deep))
-        }.map { (_, v) ->
-            MockTreeConfig(children = mutableListOf()) to v
+            mock.path?.let {
+                val index = mock.path.indexOf('/', deep)
+                if (index == -1) {
+                    mock.path
+                } else {
+                    mock.path.substring(0, index)
+                }
+            }
+        }.map { (k, v) ->
+            MockTreeConfig(path = k, children = mutableListOf()) to v
         }.forEach { (k, v) ->
-            dfs(k, v, deep + 1)
-            root.children.add(k)
+            if (v.size > 1) {
+                dfs(k, v, deep + 1)
+                root.children.add(k)
+            } else {
+                root.children.add(v[0])
+            }
         }
     }
 

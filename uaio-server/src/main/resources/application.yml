@@ -1,4 +1,6 @@
 micronaut:
+  server:
+    context-path: /api
   application:
     name: uaio-server
   router:
