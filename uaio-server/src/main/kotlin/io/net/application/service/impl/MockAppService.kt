@@ -18,9 +18,4 @@ class MockAppService(
         }
     }
 
-    override suspend fun listTree() {
-        val mocks = mockService.list()
-        TODO("Not yet implemented")
-    }
-
 }

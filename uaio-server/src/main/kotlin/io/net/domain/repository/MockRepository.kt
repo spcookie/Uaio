@@ -2,7 +2,7 @@ package io.net.domain.repository
 
 import io.net.components.domain.ID
 import io.net.domain.model.entity.Mock
-import io.net.domain.model.valueobject.MockConfig
+import io.net.domain.model.valueobject.Method
 import kotlinx.coroutines.flow.Flow
 
 interface MockRepository {
@@ -15,8 +15,8 @@ interface MockRepository {
 
     suspend fun list(): Flow<Mock>
 
-    suspend fun findByMethodAndPath(method: MockConfig.Method, path: String): Flow<Mock>
+    suspend fun findByMethodAndPath(method: Method, path: String): Flow<Mock>
 
-    suspend fun findAllByMethodAndPathAndIdNotEqual(method: MockConfig.Method, path: String, id: ID): Flow<Mock>
+    suspend fun findAllByMethodAndPathAndIdNotEqual(method: Method, path: String, id: ID): Flow<Mock>
 
 }

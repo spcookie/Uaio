@@ -4,6 +4,7 @@ import io.net.components.domain.ID
 import io.net.domain.model.entity.Mock
 import io.net.domain.model.entity.MockServer
 import io.net.domain.model.valueobject.MockServerConfig
+import io.net.domain.model.valueobject.MockTreeConfig
 import kotlinx.coroutines.flow.Flow
 
 interface IMockService {
@@ -26,6 +27,6 @@ interface IMockService {
 
     suspend fun getServerStats(): MockServer.Statue?
 
-    suspend fun listTree(): Flow<Mock>
+    suspend fun listTree(): MockTreeConfig
 
 }

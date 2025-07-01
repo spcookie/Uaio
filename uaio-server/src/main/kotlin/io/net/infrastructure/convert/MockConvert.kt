@@ -3,7 +3,7 @@ package io.net.infrastructure.convert
 import io.net.common.enums.HttpArg
 import io.net.components.domain.identify
 import io.net.domain.model.entity.Mock
-import io.net.domain.model.valueobject.MockConfig
+import io.net.domain.model.valueobject.*
 import io.net.infrastructure.adapter.db.po.MockPO
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
@@ -27,8 +27,8 @@ abstract class MockConvert {
             }
             args = entity.config.args.map {
                 when (it) {
-                    is MockConfig.PathArg -> "path" to it.name
-                    is MockConfig.QueryArg -> "query" to it.name
+                    is PathArg -> "path" to it.name
+                    is QueryArg -> "query" to it.name
                 }
             }
             template = entity.config.template
@@ -39,15 +39,15 @@ abstract class MockConvert {
         return Mock(
             id = po.id.identify,
             config = MockConfig(
-                method = MockConfig.Method.valueOf(po.method!!),
+                method = Method.valueOf(po.method!!),
                 path = po.path!!,
                 headers = po.headers?.map {
-                    MockConfig.Header(it.key, it.value)
+                    Header(it.key, it.value)
                 } ?: listOf(),
                 args = po.args?.map {
                     when (it.first) {
-                        HttpArg.Query.value -> MockConfig.QueryArg(it.second)
-                        HttpArg.Path.value -> MockConfig.PathArg(it.second)
+                        HttpArg.Query.value -> QueryArg(it.second)
+                        HttpArg.Path.value -> PathArg(it.second)
                         else -> throw IllegalArgumentException("unknown arg type: ${it.first}")
                     }
                 } ?: listOf(),

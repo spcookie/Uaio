@@ -82,11 +82,11 @@ class MockController(
         }.thenReturn<Result<Unit>>(Result.success())
     }
 
-    @Operation(tags = [OPENAPI_TAG], summary = "获取 Mock 列表")
+    @Operation(tags = [OPENAPI_TAG], summary = "获取 Mock 树形列表")
     @Get("/tree")
-    fun listTree(): Mono<Result<List<MockTreeResponse>>> {
+    fun listTree(): Mono<Result<MockTreeResponse>> {
         return mono {
-            Result.success(mockService.list().map { it.convert() }.toList())
+            Result.success(mockService.listTree().convert())
         }
     }
 

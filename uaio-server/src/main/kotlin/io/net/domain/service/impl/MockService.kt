@@ -2,16 +2,19 @@ package io.net.domain.service.impl
 
 import io.micronaut.transaction.annotation.Transactional
 import io.net.components.domain.ID
+import io.net.components.domain.scalar
 import io.net.components.excption.BusinessException
 import io.net.domain.model.entity.Mock
 import io.net.domain.model.entity.MockEngine
 import io.net.domain.model.entity.MockServer
 import io.net.domain.model.valueobject.MockServerConfig
+import io.net.domain.model.valueobject.MockTreeConfig
 import io.net.domain.repository.MockRepository
 import io.net.domain.service.IMockService
 import jakarta.annotation.PreDestroy
 import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.sync.Mutex
@@ -116,8 +119,35 @@ class MockService(
         }
     }
 
-    override suspend fun listTree(): Flow<Mock> {
-        TODO("Not yet implemented")
+    override suspend fun listTree(): MockTreeConfig {
+        val mocks = mockRepository.list()
+            .map { mock ->
+                MockTreeConfig(
+                    id = mock.id.scalar,
+                    method = mock.config.method,
+                    path = mock.config.path,
+                    headers = mock.config.headers,
+                    args = mock.config.args,
+                    template = mock.config.template,
+                    children = mutableListOf()
+                )
+            }
+            .toList()
+            .toMutableList()
+        val root = MockTreeConfig(children = mutableListOf())
+        dfs(root, mocks)
+        return root
+    }
+
+    private fun dfs(root: MockTreeConfig, mocks: List<MockTreeConfig>, deep: Int = 0) {
+        mocks.groupBy { mock ->
+            mock.path?.substring(0, mock.path.indexOf('/', deep))
+        }.map { (_, v) ->
+            MockTreeConfig(children = mutableListOf()) to v
+        }.forEach { (k, v) ->
+            dfs(k, v, deep + 1)
+            root.children.add(k)
+        }
     }
 
 }
