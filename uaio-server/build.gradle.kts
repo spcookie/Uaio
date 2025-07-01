@@ -25,7 +25,6 @@ dependencies {
     kapt("io.micronaut.validation:micronaut-validation-processor")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
     kapt("io.micronaut.openapi:micronaut-openapi")
-    kapt("io.micronaut.openapi:micronaut-openapi-adoc")
     implementation("io.micrometer:context-propagation")
     implementation("io.micronaut:micronaut-management")
     implementation("io.micronaut:micronaut-retry")
