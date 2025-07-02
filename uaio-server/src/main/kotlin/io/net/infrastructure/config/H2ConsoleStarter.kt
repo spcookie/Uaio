@@ -2,6 +2,7 @@ package io.net.infrastructure.config
 
 import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.runtime.server.event.ServerStartupEvent
+import io.micronaut.scheduling.annotation.Async
 import jakarta.annotation.PreDestroy
 import jakarta.inject.Singleton
 import org.h2.tools.Server
@@ -16,6 +17,7 @@ class H2ConsoleStarter {
 
     private var webServer: Server? = null
 
+    @Async
     @EventListener
     fun onStartup(event: ServerStartupEvent) {
         webServer = Server.createWebServer(

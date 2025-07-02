@@ -142,24 +142,22 @@ class MockService(
         return root
     }
 
-    private fun dfs(root: MockTreeConfig, mocks: List<MockTreeConfig>, deep: Int = 0) {
+    private fun dfs(parent: MockTreeConfig, mocks: List<MockTreeConfig>, deep: Int = 1) {
         mocks.groupBy { mock ->
-            mock.path?.let {
-                val index = mock.path.indexOf('/', deep)
-                if (index == -1) {
-                    mock.path
-                } else {
-                    mock.path.substring(0, index)
-                }
+            val index = mock.path.indexOf('/', deep)
+            if (index == -1) {
+                mock.path
+            } else {
+                mock.path.substring(0, (index + 1).coerceAtMost(mock.path.length))
             }
         }.map { (k, v) ->
-            MockTreeConfig(path = k, children = mutableListOf()) to v
+            MockTreeConfig(path = k.substringAfter('/'), children = mutableListOf()) to v
         }.forEach { (k, v) ->
-            if (v.size > 1) {
-                dfs(k, v, deep + 1)
-                root.children.add(k)
+            if (!k.path.endsWith("/")) {
+                parent.children.addAll(v)
             } else {
-                root.children.add(v[0])
+                parent.children.add(k)
+                dfs(k, v, k.path.length + 1)
             }
         }
     }
